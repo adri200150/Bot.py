@@ -9,7 +9,7 @@ import google.generativeai as genai
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "TU_TELEGRAM_BOT_TOKEN_AQUI")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AQ.Ab8RN6JbC_9zhnLfPYYSFxjVwRjidlcaFSokZfXqZU4G2tdvvw")
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+genai.configure(api\key=GEMENI\_APY\_KEY)
 
 TIPSTER_SYSTEM_PROMPT = (
     "Eres el analista y tipster deportivo más preciso y riguroso del mundo. "
