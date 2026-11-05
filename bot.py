@@ -3,8 +3,7 @@ import os
 import asyncio
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
-from google import genai
-from google.genai import types
+import google.generativeai as genai 
 
 # Si tienes el token de BotFather de Telegram, sustitúyelo entre las comillas
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "TU_TELEGRAM_BOT_TOKEN_AQUI")
