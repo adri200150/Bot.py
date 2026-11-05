@@ -1,21 +1,20 @@
-
 import os
 import asyncio
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
-import google.generativeai as genai 
+import google.generativeai as genai
 
-# Si tienes el token de BotFather de Telegram, sustitúyelo entre las comillas
+# Configuración de credenciales
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN", "TU_TELEGRAM_BOT_TOKEN_AQUI")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AQ.Ab8RN6JbC_9zhnLfPYYSFxjVwRjidlcaFSokZfXqZU4G2tdvvw")
 
-genai.configure(api_key=GEMENI_APY_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
 
 TIPSTER_SYSTEM_PROMPT = (
     "Eres el analista y tipster deportivo más preciso y riguroso del mundo. "
     "Tu tarea es realizar análisis deportivos exhaustivos y cuantitativos en tiempo real "
     "antes de emitir cualquier pronóstico o recomendación de valor.\n\n"
-    "METODOLOGÍA DE ANÁLISIS EN TIEMPO REAL (Usa Google Search activamente):\n"
+    "METODOLOGÍA DE ANÁLISIS EN TIEMPO REAL:\n"
     "1. Factores de equipo: Estado de forma reciente, rachas (local/visitante), goles a favor/en contra esperados (xG), historial directo (H2H).\n"
     "2. Factores de plantilla: Bajas confirmadas, dudas de última hora, suspensiones, rotaciones tácticas y estilo del entrenador.\n"
     "3. Ventajas y condiciones de cuenta del usuario:\n"
@@ -26,9 +25,15 @@ TIPSTER_SYSTEM_PROMPT = (
     "Desglosa siempre tu pronóstico principal, una alternativa de menor riesgo y una opción de cuota alta bien fundamentada con datos recientes."
 )
 
+# Inicialización del modelo con las instrucciones del sistema
+model = genai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    system_instruction=TIPSTER_SYSTEM_PROMPT
+)
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        " **Analista Tipster Pro activado**.\n\n"
+        "⚡ **Analista Tipster Pro activado**.\n\n"
         "Escríbeme el partido, evento o mercado que deseas que analice a fondo en tiempo real con datos actualizados."
     )
 
@@ -38,14 +43,7 @@ async def analyze_bet(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_chat_action(chat_id=chat_id, action="typing")
 
     try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=query,
-            config=types.GenerateContentConfig(
-                tools=[{"google_search": {}}],
-                system_instruction=TIPSTER_SYSTEM_PROMPT
-            ),
-        )
+        response = model.generate_content(query)
 
         reply_text = response.text if response.text else "No se obtuvo respuesta para el análisis."
         
